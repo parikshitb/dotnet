@@ -1,12 +1,16 @@
 ﻿Console.WriteLine("This shall take a while . . . . . . .");
 var cts = new CancellationTokenSource();
-var token = cts.Token;
-//cts.CancelAfter(10000); //does not call async operation? 
+//cts.CancelAfter(1000); 
 
 try
 {
-    MyClassAsync.LongWork(token);
-    cts.Cancel();
+    var task = MyClass.LongWork(cts.Token);
+    Thread.Sleep(1000);
+    if (!task.IsCompleted)
+    {
+        Console.WriteLine("Initiate Cacnelling. . . . . . . . .");
+        cts.Cancel();
+    }
     Console.WriteLine("All good comes to those who wait");
 }
 catch (TaskCanceledException)
@@ -26,12 +30,12 @@ finally
     cts.Dispose();
 }
 
-public class MyClassAsync
+public class MyClass
 {
-    public static Task LongWork(CancellationToken ct)
+    public static Task LongWork(CancellationToken token)
     {
         Task? task = null;
-        ct.Register(CallMeIfCancelled);
+        _ = token.Register(CallMeIfCancelled);
         task = Task.Run(() =>
         {
             Console.WriteLine("Long work started");
@@ -43,9 +47,7 @@ public class MyClassAsync
 
     private static void CallMeIfCancelled()
     {
-        Console.WriteLine("Task Cancelled :( ");
+        Console.WriteLine("Task Cancelled. . . . . .");
         throw new TaskCanceledException();
     }
 }
-
-
