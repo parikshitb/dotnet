@@ -34,9 +34,9 @@ public class MyClassAsync
         ct.Register(CallMeIfCancelled);
         task = Task.Run(() =>
         {
-            Task.Delay(5000);
             Console.WriteLine("Long work started");
-            Task.Delay(5000);
+            Thread.Sleep(5000);
+            Console.WriteLine("Long work Ended");
         });
         return task;
     }
