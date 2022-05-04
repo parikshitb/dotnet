@@ -54,7 +54,7 @@ public class MyClass
 
     private static void CallMeIfCancelled()
     {
-        Console.WriteLine($"On Thread {Thread.CurrentThread.ManagedThreadId}: Task Cancelled.");
+        MyLogger.LogWithThreadId("Task Cancelled.");
         throw new TaskCanceledException();
     }
 }
