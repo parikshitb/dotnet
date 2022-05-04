@@ -1,4 +1,4 @@
-﻿Console.WriteLine("This shall take a while . . . . . . .");
+﻿MyLogger.LogWithThreadId("This shall take a while . . . . . . .");
 var cts = new CancellationTokenSource();
 
 try
@@ -11,10 +11,10 @@ try
     Thread.Sleep(1000);
     if (!task.IsCompleted)
     {
-        Console.WriteLine("Initiate Cacnelling >>.");
+        MyLogger.LogWithThreadId("Initiate Cacnelling >>.");
         cts.Cancel();
     }
-    Console.WriteLine("All good comes to those who wait");
+    MyLogger.LogWithThreadId("All good comes to those who wait");
 }
 //https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/exception-handling-task-parallel-library
 //https://docs.microsoft.com/en-us/archive/msdn-magazine/2009/brownfield/aggregating-exceptions#figure-3-aggregateexception-in-parallel-invocation
@@ -24,7 +24,7 @@ catch (AggregateException aggex)
     {
         if (ex is TaskCanceledException)
         {
-            Console.WriteLine("Task Cancellation well received.");
+            MyLogger.LogWithThreadId("Task Cancellation well received.");
             return true;
         }
         return false; //Considered as unhandled exception
@@ -45,16 +45,25 @@ public class MyClass
         Task? task = null;
         task = Task.Run(() =>
         {
-            Console.WriteLine("Long work started.");
+            MyLogger.LogWithThreadId("Long work started.");
             Thread.Sleep(5000);
-            Console.WriteLine("Long work Ended.");
+            MyLogger.LogWithThreadId("Long work Ended.");
         });
         return task;
     }
 
     private static void CallMeIfCancelled()
     {
-        Console.WriteLine("Task Cancelled.");
+        Console.WriteLine($"On Thread {Thread.CurrentThread.ManagedThreadId}: Task Cancelled.");
         throw new TaskCanceledException();
+    }
+}
+
+public class MyLogger
+{
+    public static void LogWithThreadId(string? message)
+    {
+        //Console.WriteLine($"On Thread {Thread.CurrentThread.ManagedThreadId}: {message}");
+        Console.WriteLine($"Thread {Environment.CurrentManagedThreadId}: {message}");
     }
 }
