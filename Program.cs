@@ -15,6 +15,7 @@ try
         cts.Cancel();
     }
     MyLogger.LogWithThreadId("All good comes to those who wait");
+    Thread.Sleep(5000);
 }
 //https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/exception-handling-task-parallel-library
 //https://docs.microsoft.com/en-us/archive/msdn-magazine/2009/brownfield/aggregating-exceptions#figure-3-aggregateexception-in-parallel-invocation
@@ -25,6 +26,7 @@ catch (AggregateException aggex)
         if (ex is TaskCanceledException)
         {
             MyLogger.LogWithThreadId("Task Cancellation well received.");
+            Thread.Sleep(5000);
             return true;
         }
         return false; //Considered as unhandled exception
