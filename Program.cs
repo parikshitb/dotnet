@@ -1,5 +1,6 @@
 ﻿MyLogger.LogWithThreadId("This shall take a while . . . . . . .");
-var cts = new CancellationTokenSource();
+var tokenSource = new CancellationTokenSource();
+var tokenSourceWithExpiry = new CancellationTokenSource(1000);// Same as CancelAfter()
 
 try
 {
@@ -7,15 +8,13 @@ try
      * For a time consuming work, wait for it to finish for x seconds
      * Continue the execution if work is not finished within the time
      */
-    var task = MyClass.TimeConsumingWork(cts.Token);
+    var task = MyClass.TimeConsumingWork(tokenSource.Token);
     Thread.Sleep(1000);
     if (!task.IsCompleted)
     {
         MyLogger.LogWithThreadId("Initiate Cacnelling >>.");
-        cts.Cancel();
+        tokenSource.Cancel();
     }
-    MyLogger.LogWithThreadId("All good comes to those who wait");
-    Thread.Sleep(5000);
 }
 //https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/exception-handling-task-parallel-library
 //https://docs.microsoft.com/en-us/archive/msdn-magazine/2009/brownfield/aggregating-exceptions#figure-3-aggregateexception-in-parallel-invocation
@@ -34,8 +33,20 @@ catch (AggregateException aggex)
 }
 finally
 {
-    cts.Dispose();
+    tokenSource.Dispose();
+    tokenSourceWithExpiry.Dispose();
 }
+
+/*
+* For a time consuming work, set the expiry time.
+* When expired, cancel the task
+*/
+AppDomain.CurrentDomain.UnhandledException +=
+    (sender, e) => { MyLogger.LogWithThreadId("Task cancellation on other thread."); };
+_ = MyClass.TimeConsumingWork(tokenSourceWithExpiry.Token);
+Thread.Sleep(5000);
+MyLogger.LogWithThreadId("All good comes to those who wait");
+Thread.Sleep(5000);
 
 public class MyClass
 {
