@@ -1,4 +1,4 @@
-# Tasks
+# Tasks and Task Cancellation
 Key takeaways and learnings
 1. Task cancellation using CancellationTokenSource.Cancel()
 2. Task cancellation using CancellationTokenSource.CancelAfter()
@@ -6,3 +6,4 @@ Key takeaways and learnings
 4. discards. https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/functional/discards
 5. AggregateException: https://docs.microsoft.com/en-us/dotnet/standard/parallel-programming/exception-handling-task-parallel-library https://docs.microsoft.com/en-us/archive/msdn-magazine/2009/brownfield/aggregating-exceptions#figure-3-aggregateexception-in-parallel-invocation
 6. Cancelling a task with Cancel() or CancelAfter() only cancels queued tasks. To stop a started task, we need to implement cancellation logic in the task by using IsCancellationRequested , maybe? *
+7. When using CancelAfter(), exception is thrown on another thread and can not be caught by try-catch block in calling thread. https://bengribaudo.com/blog/2018/02/08/4360/understanding-cancellation-callbacks
